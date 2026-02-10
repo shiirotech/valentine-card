@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>😇 My Valentines Card 😇</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-image: url("pictures/bg.avif");
+        background-size: cover;
+        background-position: center;   
+        background-repeat: no-repeat;
+        text-align: center;
+    }
+
+    .dynapuff-regular {
+        font-family: "DynaPuff", system-ui;
+        font-weight: 400;
+    }
+
+    .dynapuff-bold {
+        font-family: "DynaPuff", system-ui;
+        font-weight: 700;
+    }
+
+    img {
+        width: 200px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        color: #ff4d6d;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 1rem;
+        color: #d34590;
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 20px;
+    }
+
+    button {
+        padding: 10px 25px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    button#yes {
+        background-color: #ff4d6d;
+        color: white;
+    }
+
+    button#no {
+        background-color: #ccc;
+    }
+
+    #celebration {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+
+        display: none;
+        align-items: center;
+        justify-content: center;
+
+        background: rgba(255, 230, 230, 0.95);
+        z-index: 20;
+    }
+
+    #celebration img {
+        width: 60vw;
+        max-width: 500px;
+    }
+
+    .celebration-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    #celebration h1 {
+        font-size: 3rem;
+        color: #ff4d6d;
+        margin: 0;
+    }
+
+    #celebration p {
+        font-size: 1.5rem;
+        color: #d34590;
+        margin: 0;
+    }
+</style>
+</head>
+<body>
+    <img id="pet" src="" alt="Cute Puppy or Kitten">
+    <h1 class="dynapuff-bold">Will you be my Valentine?</h1>
+
+    <div class="buttons">
+        <button id="yes" class="dynapuff-regular">Yes</button>
+        <button id="no" class="dynapuff-regular">No</button>
+    </div>
+    
+    <h2 class="dynapuff-regular">P.S.: "No" is a little bit shy 😚</h2>
+
+    <div id="celebration">
+        <div class="celebration-content">
+            <h1 class="dynapuff-regular">YAAAY!!! 💖💖💖</h1>
+            <img src="pictures/love.gif" alt="So happy!">
+            <p class="dynapuff-regular">You just made me the happiest person on Earth 😘</p>
+        </div>
+    </div>
+
+    <script>
+        const images = ["pictures/one.png", "pictures/two.png",
+                        "pictures/three.png", "pictures/four.png",
+                        "pictures/five.png", "pictures/six.png"
+        ];
+
+        const imgElement = document.getElementById("pet");
+        const noButton = document.getElementById("no");
+        const yesButton = document.getElementById("yes");
+        const celebration = document.getElementById("celebration");
+
+        // Need this to store original size and pos of the Yes button
+        const yesOriginal = {
+            width: yesButton.offsetWidth + "px",
+            height: yesButton.offsetHeight + "px",
+            fontSize: window.getComputedStyle(yesButton).fontSize,
+            position: yesButton.style.position || "static",
+            top: yesButton.style.top || "auto",
+            left: yesButton.style.left || "auto",
+            borderRadius: yesButton.style.borderRadius || "8px",
+            transform: yesButton.style.transform || "scale(1)"
+        };
+
+        // Set random image, avoid current
+        function setRandomImage(currImg = null) {
+            let availableImages = images;
+            if (currImg) {
+                const currentFile = currImg.split("/").pop()
+                availableImages = images.filter(img => !img.endsWith(currentFile));
+            }
+            const randomIndex = Math.floor(Math.random() * availableImages.length);
+            imgElement.src = availableImages[randomIndex];
+        }
+
+        setRandomImage();
+
+        // Place No button randomly without overlapping Yes
+        function placeNoButton() {
+            const yesRect = yesButton.getBoundingClientRect();
+            const maxAttempts = 20;
+            let attempt = 0;
+            let x, y;
+            
+            do {
+                x = Math.random() * (window.innerWidth - noButton.offsetWidth);
+                y = Math.random() * (window.innerHeight - noButton.offsetHeight);
+                attempt++;
+            } while (
+                attempt < maxAttempts &&
+                x < yesRect.right &&
+                x + noButton.offsetWidth > yesRect.left &&
+                y < yesRect.bottom &&
+                y + noButton.offsetHeight > yesRect.top
+            );
+            
+            noButton.style.position = "absolute";
+            noButton.style.left = x + "px";
+            noButton.style.top = y + "px";
+        }
+
+        let hoverCount = 0;
+        const maxHovers = 10;
+
+        // Move No button and grow Yes button
+        noButton.addEventListener("mouseenter", () => {
+            placeNoButton();
+            hoverCount++;
+
+            if (hoverCount <= maxHovers) {
+                const scale = 1 + hoverCount * 0.5;
+                yesButton.style.transform = "scale(" + scale + ")";
+            } else {
+                yesButton.style.position = "fixed";
+                yesButton.style.top = "0";
+                yesButton.style.left = "0";
+                yesButton.style.width = "100vw";
+                yesButton.style.height = "100vh";
+                yesButton.style.fontSize = "5rem";
+                yesButton.style.borderRadius = "0";
+                yesButton.style.zIndex = "10";
+            }
+        });
+
+        // Click Yes = show celebration GIF
+        yesButton.addEventListener("click", () => {
+            celebration.style.display = "flex";
+            noButton.style.pointerEvents = "none";
+            
+            // Reset yes button
+            Object.assign(yesButton.style, yesOriginal);
+
+            hoverCount = 0;
+            noButton.style.position = "static";
+
+            setRandomImage(imgElement.src);
+        });
+
+        // Click elsewhere to hide celebration
+        celebration.addEventListener("click", () => {
+            celebration.style.display = "none";
+            noButton.style.pointerEvents = "auto";
+        });
+    </script>
+</body>
+</html>
