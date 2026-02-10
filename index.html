@@ -199,7 +199,7 @@
         const maxHovers = 10;
 
         // Move No button and grow Yes button
-        noButton.addEventListener("mouseenter", () => {
+        function handleNoInteraction() {
             placeNoButton();
             hoverCount++;
 
@@ -216,6 +216,15 @@
                 yesButton.style.borderRadius = "0";
                 yesButton.style.zIndex = "10";
             }
+        }
+
+        // Desktop hover
+        noButton.addEventListener("mouseenter", handleNoInteraction);
+
+        // Mobile tap
+        noButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            handleNoInteraction();
         });
 
         // Click Yes = show celebration GIF
@@ -239,4 +248,5 @@
         });
     </script>
 </body>
+
 </html>
